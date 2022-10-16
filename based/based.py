@@ -1,6 +1,7 @@
 from redbot.core import commands, Config, checks
 from pathlib import Path
 import string
+import random
 import re
 
 class Based(commands.Cog):
