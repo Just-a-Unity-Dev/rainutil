@@ -216,6 +216,7 @@ class Github(commands.Cog):
                 "purple_circle",
                 "grey_question"
             ]
+        ctx.reply("Reset all custom emoji's")
 
     @config.command("remove")
     async def config_remove(self, ctx: commands.Context, name):
