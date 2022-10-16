@@ -24,7 +24,12 @@ class Github(commands.Cog):
         ]
 
         default_guild = {
-            "servers": {},
+            "emojis": [
+                "green_circle",
+                "red_circle",
+                "grey_question",
+                "purple_circle",
+            ],
             "github": {},
             "default_name": None,
         }
@@ -53,14 +58,15 @@ class Github(commands.Cog):
                         default_name = await default_name_c()
                         if default_name != None:
                             return await message.channel.send(
-                                embed=self.get_github_embed(
+                                embed=await self.get_github_embed(
                                     github[default_name]['url'],
-                                    issue_id
+                                    issue_id,
+                                    message.guild
                                 )
                             )
                     
                     if str(value['prefix']) == str(prefix):
-                        return await message.channel.send(embed=self.get_github_embed(value['url'], issue_id))
+                        return await message.channel.send(embed=await self.get_github_embed(value['url'], issue_id),guild=message.guild)
         
     def github_url(self, sub: str) -> str:
 	    return f"https://api.github.com{sub}"
@@ -82,7 +88,7 @@ class Github(commands.Cog):
         
         return '\n'.join(new_body)
 	
-    def get_github_embed(self, repo: str, issue_id: int):
+    async def get_github_embed(self, repo: str, issue_id: int, guild):
             issue_url = self.github_url(f"/repos/{repo}/issues/{issue_id}")
             pr_url = self.github_url(f"/repos/{repo}/pulls/{issue_id}")
 
@@ -122,9 +128,19 @@ class Github(commands.Cog):
                 issue_type = 1
 
             embed = discord.Embed()
+            
+            async def fix_title(title: str):
+                async with self.config.guild(guild).emojis() as emojis:
+                    selected = emojis[state]
+                    if type(selected) == str:
+                        return f":{selected}: {title}"
+                    return f"<:{self.bot.get_emoji(selected).name}:{selected}> {title}"
+
+            embed.title = await fix_title(issue_data['title'])
+
             fixed_body = self.fix_body(issue_data['body'])
             body = (fixed_body[:500] + '...') if len(fixed_body) > 300 else fixed_body
-            embed.title = issue_data['title']
+            
             embed.url = f"https://github.com/{repo}/issues/{issue_id}"
             embed.description = body
             embed.color = self.colors[state]
@@ -165,6 +181,42 @@ class Github(commands.Cog):
             }
         return await ctx.reply(f"Created new github {name}.")
     
+    @config.command("emoji")
+    async def config_emoji(self, ctx: commands.Context, name, emoji):
+        """Configure the servers emojis. `name` takes 4 arguments (open,close,draft,merge). `emoji` is an EMOJI ID."""
+        if name is None:
+            return await ctx.reply("Lacking a `name`.")
+        if emoji is None:
+            return await ctx.reply("Lacking an `emoji`.")
+        if int(emoji) is None:
+            return await ctx.reply("Lacking an `emoji`.")
+
+        async with self.config.guild(ctx.guild).emojis() as emojis:
+            def string_to_equivalent(stri: str):
+                if stri == "open":
+                    return 0
+                if stri == "close":
+                    return 1
+                if stri == "draft":
+                    return 2
+                if stri == "merge":
+                    return 3
+
+            emojis[string_to_equivalent(name)] = int(emoji)
+            return await ctx.reply(f"Set `{name}` to `{emoji}`")
+
+    
+    @config.command("reset_emoji")
+    async def config_reset_emoji(self, ctx: commands.Context):
+        """Resets emoji"""
+        async with self.config.guild(ctx.guild).emojis() as emoji:
+            emoji = [
+                "green_circle",
+                "red_circle",
+                "purple_circle",
+                "grey_question"
+            ]
+
     @config.command("remove")
     async def config_remove(self, ctx: commands.Context, name):
         """Removes a GitHub via name."""
