@@ -3,3 +3,4 @@ pathlib
 numpy
 asyncio
 aiohttp
+discord
