@@ -66,7 +66,7 @@ class Github(commands.Cog):
                             )
                     
                     if str(value['prefix']) == str(prefix):
-                        return await message.channel.send(embed=await self.get_github_embed(value['url'], issue_id),guild=message.guild)
+                        return await message.channel.send(embed=await self.get_github_embed(value['url'], issue_id, message.guild))
         
     def github_url(self, sub: str) -> str:
 	    return f"https://api.github.com{sub}"
