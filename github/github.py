@@ -7,7 +7,7 @@ import json
 import re
 
 class Github(commands.Cog):
-    """When You Code It!!! (x67)"""
+    """Github cog"""
 
     def __init__(self, bot) -> None:
         self.bot = bot
