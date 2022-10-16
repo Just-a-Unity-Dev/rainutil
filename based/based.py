@@ -49,9 +49,7 @@ class Based(commands.Cog):
                 based = "Cad é ina bunaithe?"
                 unbased = "Ní bunaithe."
     
-            channel = message.channel
-
             if random.random() > 0.005:
-                await channel.send(based)
+                await message.channel.send(based)
             else:
-                await channel.send(unbased)
+                await message.channel.send(unbased)
