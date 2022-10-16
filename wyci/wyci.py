@@ -28,7 +28,7 @@ class Wyci(commands.Cog):
             if (count + 1) <= 1:
                 return await message.channel.send("When You Code It!!!")
             else:
-                return await message.channel.send(f"When You Code It!!! (x{count + 1})")
+                return await message.channel.send(f"When You Code It!!! (x{count + 1 })")
         
     @wyci.group()
     @checks.admin_or_permissions(manage_guild=True)
