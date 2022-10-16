@@ -13,8 +13,8 @@ class Based(commands.Cog):
         
     @commands.Cog.listener()
     async def on_message(self, message):
-        for match in re.finditer(r"\S\s+(?:when|whence)[\s*?.!)]*$", message.content):
-            match = re.search(r"^\s*(based|gebaseerd|basé|basato|basado|basiert|ベース)[\s*?.!)]*$", message.content, re.IGNORECASE)
+        for match in re.finditer(r"^\s*(based|gebaseerd|basé|basato|basado|basiert|ベース)[\s*?.!)]*$", message.content):
+            
             if match is None:
                 return
     
