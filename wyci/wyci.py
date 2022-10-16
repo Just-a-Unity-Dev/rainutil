@@ -3,7 +3,7 @@ from pathlib import Path
 import string
 import re
 
-class RainUtil(commands.Cog):
+class Wyci(commands.Cog):
     """When You Code It!!! (x67)"""
 
     def __init__(self, bot) -> None:
