@@ -1,0 +1,5 @@
+pyfiglet
+pathlib
+numpy
+asyncio
+aiohttp
