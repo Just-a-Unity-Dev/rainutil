@@ -24,7 +24,7 @@ class Poll(commands.Cog):
         emojinumbers = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
         output = []
         answers = ranswers.split(",")
-        output.append(f"Question: **{question}** *by {ctx.author.mention}*")
+        output.append(f"Poll: **{question}** *by {ctx.author.mention}*")
         for i, answer in enumerate(answers):
             output.append(f":{numbers[i]}: - {answer}")
         message = await ctx.send('\n'.join(output))
