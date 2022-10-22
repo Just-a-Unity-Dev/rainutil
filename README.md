@@ -9,4 +9,4 @@ A general utility cog.
 |wyci|Responds with "When You Code It!!!" whenever a message ends with "when"|
 |poll|Make a basic poll in less than a few seconds|
 |based|Based on what?|
-|ss14|A basic command to restart SS14 servers.|
+|ss14|A basic cog to control SS14 servers via watchdog.|
