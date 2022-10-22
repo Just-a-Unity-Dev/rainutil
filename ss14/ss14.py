@@ -33,7 +33,9 @@ class SS14(commands.Cog):
 
         async with self.config.guild(ctx.guild).servers() as servers:
             if name not in servers:
+                await ctx.send(repr(servers))
                 return await ctx.send("That server did not exist.")
+            
             config = servers[name]
             try:
                 base_url: str = config["url"]
