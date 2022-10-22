@@ -21,7 +21,7 @@ class SS14(commands.Cog):
         """SS14 commands."""
         pass
 
-    async def ping_url(url: str, key: str, token: str):
+    async def ping_url(self, url: str, key: str, token: str):
         try:
             base_url: str = url
             instance: str = key
