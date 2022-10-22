@@ -10,9 +10,11 @@ class SS14(commands.Cog):
     def __init__(self, bot) -> None:
         self.bot = bot
         self.script_location = Path(__file__).absolute().parent
-        self.config = Config.get_conf(self, 425976432185784)
+        self.config = Config.get_conf(self, 635473658356)
+        self.issue = r"\[(?:(\S+)#|#)?([0-9]+)\]"
         default_guild = {
-            "servers": {}
+            "servers": {},
+            "github": {}
         }
         self.config.register_guild(**default_guild)
 
@@ -21,34 +23,9 @@ class SS14(commands.Cog):
         """SS14 commands."""
         pass
 
-    async def ping_url(self, url: str, key: str, token: str):
-        try:
-            base_url: str = url
-            instance: str = key
-
-            if base_url.endswith("/"):
-                base_url = base_url[:1]
-
-            url = base_url + f"/instances/{instance}/restart"
-            auth_header = "Basic " + base64.b64encode(f"{instance}:{token}".encode("ASCII")).decode("ASCII")
-
-            async with aiohttp.ClientSession() as session:
-                async def load():
-                    async with session.post(url, headers={"Authorization": auth_header}) as resp:
-                        if resp.status != 200:
-                            await (4, resp.status)
-                        else:
-                            return await (1, 200)
-                await asyncio.wait_for(load(), timeout=5)
-        except asyncio.TimeoutError:
-            return (2, 0)
-        except Exception as err:
-            # wtf
-            return (3, 0)
-
-    @ss14.command(name="restart")
+    @ss14.command(name="control")
     @checks.admin_or_permissions(manage_guild=True)
-    async def restart(self, ctx: commands.Context, name):
+    async def control(self, ctx: commands.Context, name, type):
         if name is None:
             return await ctx.reply("Lacking a `name`.")
     
@@ -58,16 +35,38 @@ class SS14(commands.Cog):
             if name not in servers:
                 return await ctx.send("That server did not exist.")
             config = servers[name]
+            try:
+                base_url: str = config["url"]
+                instance: str = config["key"]
+                token: str = config["token"]
 
-            async with self.ping_url(config['url'], config['key'], config['token']) as url:
-                if url[0] == 1:
-                    return await ctx.reply(f"Restarted {name}")
-                if url[0] == 2:
-                    return await ctx.reply("Server timed out.")
-                if url[0] == 3:
-                    return await ctx.reply("Unknown exception occured")
-                if url[0] == 4:
-                    return await ctx.reply(f"Wrong status code: {url[1]}")
+                if base_url.endswith("/"):
+                    base_url = base_url[:1]
+
+                url = base_url + f"/instances/{instance}/restart"
+
+                if type == "update":
+                    url = base_url + f"/instances/{instance}/update"
+                elif type == "restart":
+                    url = base_url + f"/instances/{instance}/restart"
+                else:
+                    return await ctx.reply("Invalid method. `update` or `restart` are the valid methods.")
+
+                auth_header = "Basic " + base64.b64encode(f"{instance}:{token}".encode("ASCII")).decode("ASCII")
+
+                async with aiohttp.ClientSession() as session:
+                    async def load():
+                        async with session.post(url, headers={"Authorization": auth_header}) as resp:
+                            if resp.status != 200:
+                                await ctx.reply(f"Wrong status code: {resp.status}")
+                            else:
+                                return await ctx.reply(f"Restarted `{name}`")
+                    await asyncio.wait_for(load(), timeout=5)
+            except asyncio.TimeoutError:
+                return await ctx.reply("Server timed out.")
+            except Exception as err:
+                # wtf
+                return await ctx.reply(f"Unexpected error occurred")
 
     @ss14.group()
     @checks.admin_or_permissions(manage_guild=True)
