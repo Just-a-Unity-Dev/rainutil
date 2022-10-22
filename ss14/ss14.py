@@ -10,8 +10,7 @@ class SS14(commands.Cog):
     def __init__(self, bot) -> None:
         self.bot = bot
         self.script_location = Path(__file__).absolute().parent
-        self.config = Config.get_conf(self, 635473658356)
-        self.issue = r"\[(?:(\S+)#|#)?([0-9]+)\]"
+        self.config = Config.get_conf(self, 423978574328573)
         default_guild = {
             "servers": {},
             "github": {}
@@ -25,15 +24,14 @@ class SS14(commands.Cog):
 
     @ss14.command(name="control")
     @checks.admin_or_permissions(manage_guild=True)
-    async def control(self, ctx: commands.Context, name, type):
+    async def control(self, ctx: commands.Context, type, name):
         if name is None:
             return await ctx.reply("Lacking a `name`.")
     
         await ctx.message.add_reaction("⏰")
 
         async with self.config.guild(ctx.guild).servers() as servers:
-            if name not in servers:
-                await ctx.send(repr(servers))
+            if str(name) not in servers:
                 return await ctx.send("That server did not exist.")
             
             config = servers[name]
@@ -62,6 +60,8 @@ class SS14(commands.Cog):
                             if resp.status != 200:
                                 await ctx.reply(f"Wrong status code: {resp.status}")
                             else:
+                                if type == "update":
+                                    return await ctx.reply(f"Updated `{name}`")
                                 return await ctx.reply(f"Restarted `{name}`")
                     await asyncio.wait_for(load(), timeout=5)
             except asyncio.TimeoutError:
